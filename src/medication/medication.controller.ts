@@ -13,6 +13,11 @@ import { CreateMedicationDto } from './dto/create-medication.dto';
 export class MedicationController {
   constructor(private medicationService: MedicationService) {}
 
+  @Get()
+  findAll() {
+    return this.medicationService.list();
+  }
+
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.medicationService.findOne(id);
