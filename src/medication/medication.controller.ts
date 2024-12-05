@@ -1,5 +1,13 @@
-import { Controller, Get, Post, Param, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  ParseIntPipe,
+  Body,
+} from '@nestjs/common';
 import { MedicationService } from './medication.service';
+import { CreateMedicationDto } from './dto/create-medication.dto';
 
 @Controller('medication')
 export class MedicationController {
@@ -11,7 +19,7 @@ export class MedicationController {
   }
 
   @Post()
-  async create() {
-    return 'this endpoint must be implemented';
+  async create(@Body() createMedicationDto: CreateMedicationDto) {
+    return this.medicationService.create(createMedicationDto);
   }
 }
