@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { Medication } from '@prisma/client';
+
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMedicationDto } from './dto/create-medication.dto';
 
@@ -18,7 +20,7 @@ export class MedicationService {
     return this.prisma.medication.create({ data: createMedicationDto });
   }
 
-  delete(id: number) {
+  async delete(id: number): Promise<Medication> {
     return this.prisma.medication.delete({ where: { id } });
   }
 }

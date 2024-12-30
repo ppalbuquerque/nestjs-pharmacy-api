@@ -6,7 +6,10 @@ import {
   ParseIntPipe,
   Body,
   Delete,
+  NotFoundException,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+
 import { MedicationService } from './medication.service';
 import { CreateMedicationDto } from './dto/create-medication.dto';
 
@@ -31,6 +34,14 @@ export class MedicationController {
 
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: number) {
-    return this.medicationService.delete(id);
+    try {
+      return await this.medicationService.delete(id);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException();
+        }
+      }
+    }
   }
 }
