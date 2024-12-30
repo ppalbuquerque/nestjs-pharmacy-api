@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Body,
+  Delete,
 } from '@nestjs/common';
 import { MedicationService } from './medication.service';
 import { CreateMedicationDto } from './dto/create-medication.dto';
@@ -26,5 +27,10 @@ export class MedicationController {
   @Post()
   async create(@Body() createMedicationDto: CreateMedicationDto) {
     return this.medicationService.create(createMedicationDto);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id', ParseIntPipe) id: number) {
+    return this.medicationService.delete(id);
   }
 }

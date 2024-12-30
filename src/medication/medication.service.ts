@@ -17,4 +17,8 @@ export class MedicationService {
   create(createMedicationDto: CreateMedicationDto) {
     return this.prisma.medication.create({ data: createMedicationDto });
   }
+
+  delete(id: number) {
+    return this.prisma.medication.delete({ where: { id } });
+  }
 }
