@@ -7,6 +7,7 @@ import {
   Body,
   Delete,
   NotFoundException,
+  Query,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
@@ -20,6 +21,15 @@ export class MedicationController {
   @Get()
   findAll() {
     return this.medicationService.list();
+  }
+
+  @Get('search')
+  async search(@Query('q') q: string) {
+    try {
+      return await this.medicationService.search(q);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   @Get(':id')
