@@ -9,7 +9,9 @@ RUN npm install
 
 COPY . .
 
-RUN npx prisma generate
+ARG DATABASE_URL
+
+RUN npx prisma generate && npx prisma generate --sql
 
 RUN npm run build
 
