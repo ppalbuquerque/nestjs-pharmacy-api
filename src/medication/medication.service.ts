@@ -1,31 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { Medication } from '@prisma/client';
-import { searchMedications } from '@prisma/client/sql';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DeleteResult, Repository } from 'typeorm';
+import { Medication } from './medication.entitity';
 
-import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMedicationDto } from './dto/create-medication.dto';
 
 @Injectable()
 export class MedicationService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    @InjectRepository(Medication)
+    private medicationRepository: Repository<Medication>,
+  ) {}
 
   list() {
-    return this.prisma.medication.findMany();
+    return this.medicationRepository.find();
   }
 
   findOne(id: number) {
-    return this.prisma.medication.findUnique({ where: { id } });
+    return this.medicationRepository.findOne({ where: { id } });
   }
 
   create(createMedicationDto: CreateMedicationDto) {
-    return this.prisma.medication.create({ data: createMedicationDto });
+    const medication = this.medicationRepository.create(createMedicationDto);
+    return this.medicationRepository.save(medication);
   }
 
-  async delete(id: number): Promise<Medication> {
-    return this.prisma.medication.delete({ where: { id } });
+  async delete(id: number): Promise<DeleteResult> {
+    return this.medicationRepository.delete({ id });
   }
 
-  async search(query: string): Promise<searchMedications.Result[]> {
-    return this.prisma.$queryRawTyped(searchMedications(query));
-  }
+  // async search(query: string): Promise<searchMedications.Result[]> {
+  //   return this.prisma.$queryRawTyped(searchMedications(query));
+  // }
 }
