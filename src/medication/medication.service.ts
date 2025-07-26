@@ -29,7 +29,16 @@ export class MedicationService {
     return this.medicationRepository.delete({ id });
   }
 
-  // async search(query: string): Promise<searchMedications.Result[]> {
-  //   return this.prisma.$queryRawTyped(searchMedications(query));
-  // }
+  async search(query: string): Promise<[Medication[], number]> {
+    const queryBuilder =
+      this.medicationRepository.createQueryBuilder('medication');
+
+    queryBuilder.where('medication.full_text_search @@ to_tsquery(:query)', {
+      query,
+    });
+
+    const result = await queryBuilder.getManyAndCount();
+
+    return result;
+  }
 }

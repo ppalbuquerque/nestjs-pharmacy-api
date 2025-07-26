@@ -23,14 +23,14 @@ export class MedicationController {
     return result;
   }
 
-  // @Get('search')
-  // async search(@Query('q') q: string) {
-  //   try {
-  //     return await this.medicationService.search(q);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
+  @Get('search')
+  async search(@Query('q') q: string) {
+    try {
+      return await this.medicationService.search(q);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
@@ -47,7 +47,7 @@ export class MedicationController {
     try {
       return await this.medicationService.delete(id);
     } catch (error: unknown) {
-      throw new NotFoundException();
+      throw new NotFoundException(error);
     }
   }
 }
