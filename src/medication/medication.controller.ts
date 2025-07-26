@@ -20,7 +20,6 @@ export class MedicationController {
   @Get()
   async findAll() {
     const result = await this.medicationService.list();
-    console.log(result);
     return result;
   }
 
