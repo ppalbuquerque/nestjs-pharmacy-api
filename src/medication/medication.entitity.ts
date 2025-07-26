@@ -38,6 +38,9 @@ export class Medication {
   @Column({ type: 'text', name: 'dosage_instructions' })
   dosageInstructions: string;
 
+  @Column({ type: 'tsvector', nullable: true, name: 'full_text_search' })
+  fullTextSearch: string;
+
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   createdAt: Date;
 
