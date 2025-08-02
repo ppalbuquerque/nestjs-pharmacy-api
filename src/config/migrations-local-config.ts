@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 
 import { Medication } from '../medication/medication.entitity';
+import { File } from '../files/entities/file.entity';
 
 export default new DataSource({
   type: 'postgres',
@@ -9,7 +10,7 @@ export default new DataSource({
   username: 'postgres',
   password: 'postgres',
   database: 'pharma',
-  entities: [Medication],
+  entities: [Medication, File],
   migrations: ['src/db/migrations/*{.ts,.js}'],
   synchronize: true,
 });
