@@ -4,10 +4,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Medication } from './medication/medication.entitity';
 import { MedicationSubscriber } from './medication/medication.subscriber';
+import { File } from './files/entities/file.entity';
+import { FilesModule } from './files/files.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     MedicationModule,
+    FilesModule,
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'db',
@@ -15,7 +20,7 @@ import { MedicationSubscriber } from './medication/medication.subscriber';
       username: 'postgres',
       password: 'postgres',
       database: 'pharma',
-      entities: [Medication],
+      entities: [Medication, File],
       subscribers: [MedicationSubscriber],
       synchronize: false,
     }),
