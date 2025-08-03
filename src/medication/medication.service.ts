@@ -33,9 +33,12 @@ export class MedicationService {
     const queryBuilder =
       this.medicationRepository.createQueryBuilder('medication');
 
-    queryBuilder.where('medication.full_text_search @@ to_tsquery(:query)', {
-      query,
-    });
+    queryBuilder.where(
+      'medication.full_text_search @@ to_tsquery(unaccent(:query))',
+      {
+        query,
+      },
+    );
 
     const result = await queryBuilder.getManyAndCount();
 

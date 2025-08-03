@@ -33,9 +33,9 @@ export class MedicationSubscriber
       `
             UPDATE medication
             SET "full_text_search" =
-                setweight(to_tsvector(coalesce(medication.usefulness, '')), 'A') ||
-                setweight(to_tsvector(coalesce(medication.name, '')), 'B') ||
-                setweight(to_tsvector(coalesce(medication.chemical_composition, '')), 'C')
+                setweight(to_tsvector('ptbr', coalesce(medication.usefulness, '')), 'A') ||
+                setweight(to_tsvector('ptbr', coalesce(medication.name, '')), 'B') ||
+                setweight(to_tsvector('ptbr', coalesce(medication.chemical_composition, '')), 'C')
             WHERE medication.id = $1
         `,
       [event.entity.id],
