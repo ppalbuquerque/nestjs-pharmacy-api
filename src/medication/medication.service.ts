@@ -12,15 +12,15 @@ export class MedicationService {
     private medicationRepository: Repository<Medication>,
   ) {}
 
-  list() {
+  list(): Promise<Medication[]> {
     return this.medicationRepository.find();
   }
 
-  findOne(id: number) {
+  findOne(id: number): Promise<Medication | null> {
     return this.medicationRepository.findOne({ where: { id } });
   }
 
-  create(createMedicationDto: CreateMedicationDto) {
+  create(createMedicationDto: CreateMedicationDto): Promise<Medication> {
     const medication = this.medicationRepository.create(createMedicationDto);
     return this.medicationRepository.save(medication);
   }
@@ -29,7 +29,7 @@ export class MedicationService {
     return this.medicationRepository.delete({ id });
   }
 
-  async search(query: string): Promise<[Medication[], number]> {
+  async search(query: string): Promise<Medication[]> {
     const queryBuilder =
       this.medicationRepository.createQueryBuilder('medication');
 
@@ -40,7 +40,7 @@ export class MedicationService {
       },
     );
 
-    const result = await queryBuilder.getManyAndCount();
+    const result = await queryBuilder.getMany();
 
     return result;
   }
