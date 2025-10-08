@@ -8,6 +8,7 @@ import {
   Delete,
   NotFoundException,
   Query,
+  DefaultValuePipe,
 } from '@nestjs/common';
 
 import { MedicationService } from './medication.service';
@@ -18,9 +19,14 @@ export class MedicationController {
   constructor(private medicationService: MedicationService) {}
 
   @Get()
-  async findAll() {
-    const result = await this.medicationService.list();
-    return result;
+  async findAll(
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('offset', new DefaultValuePipe(0), ParseIntPipe) offset: number,
+  ) {
+    return this.medicationService.list({
+      offset,
+      limit,
+    });
   }
 
   @Get('search')

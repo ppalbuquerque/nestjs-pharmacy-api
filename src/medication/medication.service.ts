@@ -4,6 +4,7 @@ import { DeleteResult, Repository } from 'typeorm';
 import { Medication } from './medication.entitity';
 
 import { CreateMedicationDto } from './dto/create-medication.dto';
+import { ListMedicationDTO } from './dto/list-medications.dto';
 
 @Injectable()
 export class MedicationService {
@@ -12,8 +13,24 @@ export class MedicationService {
     private medicationRepository: Repository<Medication>,
   ) {}
 
-  list(): Promise<Medication[]> {
-    return this.medicationRepository.find();
+  async list(
+    listMedicationDto: ListMedicationDTO,
+  ): Promise<{ medications: Medication[]; nextPage: number | null }> {
+    const [medications, total] = await this.medicationRepository.findAndCount({
+      take: listMedicationDto.limit,
+      skip: listMedicationDto.offset,
+    });
+
+    const { offset, limit } = listMedicationDto;
+
+    const nextPage = offset + limit;
+
+    const hasNextPage = nextPage < total;
+
+    return {
+      medications,
+      nextPage: hasNextPage ? nextPage : null,
+    };
   }
 
   findOne(id: number): Promise<Medication | null> {
