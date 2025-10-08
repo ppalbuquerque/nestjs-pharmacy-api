@@ -5,6 +5,7 @@ import { Medication } from './medication.entitity';
 
 import { CreateMedicationDto } from './dto/create-medication.dto';
 import { ListMedicationDTO } from './dto/list-medications.dto';
+import { UpdateMedicationDTO } from './dto/update-medication.dto';
 
 @Injectable()
 export class MedicationService {
@@ -46,10 +47,17 @@ export class MedicationService {
     return this.medicationRepository.delete({ id });
   }
 
+  async updateOne(updateMedicationDto: UpdateMedicationDTO) {
+    return this.medicationRepository.update(
+      { id: updateMedicationDto.id },
+      { ...updateMedicationDto },
+    );
+  }
+
   async search(query: string): Promise<Medication[]> {
     const result = await this.medicationRepository.query(
       `
-      select * from medication where full_text_search @@ to_tsquery('portuguese', unaccent($1))
+      select * from medication where full_text_search @@ plainto_tsquery('portuguese', unaccent($1))
       UNION
       select * from medication where name ilike $2
       UNION
