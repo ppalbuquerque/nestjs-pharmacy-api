@@ -30,17 +30,18 @@ export class MedicationService {
   }
 
   async search(query: string): Promise<Medication[]> {
-    const queryBuilder =
-      this.medicationRepository.createQueryBuilder('medication');
-
-    queryBuilder.where(
-      'medication.full_text_search @@ to_tsquery(unaccent(:query))',
-      {
-        query,
-      },
+    const result = await this.medicationRepository.query(
+      `
+      select * from medication where full_text_search @@ to_tsquery('portuguese', unaccent($1))
+      UNION
+      select * from medication where name ilike $2
+      UNION
+      select * from medication where chemical_composition ilike $2
+      UNION
+      select * from medication where $1 % usefulness;
+    `,
+      [query, `%${query}%`],
     );
-
-    const result = await queryBuilder.getMany();
 
     return result;
   }
