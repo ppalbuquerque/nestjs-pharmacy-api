@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - ci/hml
+      - feat/add-github-actions-pipeline
 jobs:
   Deploy:
     runs-on: ubuntu-latest
@@ -14,7 +15,7 @@ jobs:
         uses: actions/checkout@v5
       - name: Build Docker image and set Docker TAG
         run: |
-          echo: "Generated Docker tag: $TAG"
+          echo "Generated Docker tag: $TAG"
           docker build -t "${{ secrets.REPOSITORY_NAME }}" .
           docker tag "${{ secrets.REPOSITORY_NAME }}" "${{ secrets.AWS_REGISTRY_URL }}/${{ secrets.REPOSITORY_NAME }}:latest"
       - name: Configure AWS credentials
