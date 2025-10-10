@@ -27,6 +27,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::133802582104:role/GitHubAction
           aws-region: sa-east-1
-      - name: Sts GetCallerIdentity
+      - name: Push docker image to AWS ECR
         run: |
-          aws sts get-caller-identity
+          aws ecr get-login-password --region sa-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_REGISTRY_URL }}
+          docker push "${{ secrets.AWS_REGISTRY_URL }}/${{ secrets.REPOSITORY_NAME }}:latest"
