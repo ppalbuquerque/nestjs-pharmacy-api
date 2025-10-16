@@ -1,5 +1,6 @@
 name: Pharma Api Deploy
 run-name: Deploy new version of Pharma NestJs API
+environment: HML
 on:
   push:
     branches:
@@ -9,7 +10,6 @@ permissions:
   id-token: write
   contents: read
 jobs:
-  environment: HML
   Build:
     runs-on: ubuntu-latest
     env:
