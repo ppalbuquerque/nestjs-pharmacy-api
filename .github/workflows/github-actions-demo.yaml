@@ -1,6 +1,5 @@
 name: Pharma Api Deploy
 run-name: Deploy new version of Pharma NestJs API
-environment: HML
 on:
   push:
     branches:
@@ -11,6 +10,7 @@ permissions:
   contents: read
 jobs:
   Build:
+    environment: HML
     runs-on: ubuntu-latest
     env:
       TAG: ${{ github.sha }}
@@ -32,6 +32,7 @@ jobs:
           aws ecr get-login-password --region sa-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_REGISTRY_URL }}
           docker push "${{ secrets.AWS_REGISTRY_URL }}/${{ secrets.REPOSITORY_NAME }}:latest"
   Deploy:
+    environment: HML
     needs: Build
     runs-on: ubuntu-latest
     steps:
