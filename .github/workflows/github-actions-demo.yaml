@@ -33,7 +33,7 @@ jobs:
           docker push "${{ secrets.AWS_REGISTRY_URL }}/${{ secrets.REPOSITORY_NAME }}:latest"
   Deploy:
     needs: Build
-    runs-on: ubuntu-last
+    runs-on: ubuntu-latest
     steps:
       - name: Install ssh key
         uses: webfactory/ssh-agent@v0.9.0
