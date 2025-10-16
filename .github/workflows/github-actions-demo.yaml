@@ -20,7 +20,7 @@ jobs:
       - name: Build Docker image and set Docker TAG
         run: |
           echo "Generated Docker tag: $TAG"
-          docker build -t "${{ secrets.REPOSITORY_NAME }}" .
+          docker build -t "${{ secrets.REPOSITORY_NAME }}" --target=prod .
           docker tag "${{ secrets.REPOSITORY_NAME }}" "${{ secrets.AWS_REGISTRY_URL }}/${{ secrets.REPOSITORY_NAME }}:latest"
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v5.1.0
