@@ -9,7 +9,7 @@ permissions:
   id-token: write
   contents: read
 jobs:
-  Deploy:
+  Build:
     runs-on: ubuntu-latest
     environment: HML
     env:
@@ -31,3 +31,23 @@ jobs:
         run: |
           aws ecr get-login-password --region sa-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_REGISTRY_URL }}
           docker push "${{ secrets.AWS_REGISTRY_URL }}/${{ secrets.REPOSITORY_NAME }}:latest"
+  Deploy:
+    needs: Build
+    runs-on: ubuntu-last
+    steps:
+      - name: Install ssh key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@ec2-18-231-120-177.sa-east-1.compute.amazonaws.com \\
+          'if sudo docker ps -q --filter "status=running" | grep -q .; then \\
+            sudo docker stop $(sudo docker ps -q --filter "status=running"); \\
+          fi && \\
+          if sudo docker ps -a -q | grep -q .; then \\
+            sudo docker rm $(sudo docker ps -a -q); \\
+          fi && \\
+          sudo docker pull 133802582104.dkr.ecr.sa-east-1.amazonaws.com/pharma/medication-api-container:latest && \\
+          sudo docker run -p 80:3000 --env-file .env 133802582104.dkr.ecr.sa-east-1.amazonaws.com/pharma/medication-api-container && \\
+          sudo docker image prune -f'
