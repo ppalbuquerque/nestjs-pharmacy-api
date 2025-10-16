@@ -9,9 +9,9 @@ permissions:
   id-token: write
   contents: read
 jobs:
+  environment: HML
   Build:
     runs-on: ubuntu-latest
-    environment: HML
     env:
       TAG: ${{ github.sha }}
     steps:
@@ -49,5 +49,5 @@ jobs:
             sudo docker rm $(sudo docker ps -a -q); \\
           fi && \\
           sudo docker pull 133802582104.dkr.ecr.sa-east-1.amazonaws.com/pharma/medication-api-container:latest && \\
-          sudo docker run -p 80:3000 --env-file .env 133802582104.dkr.ecr.sa-east-1.amazonaws.com/pharma/medication-api-container && \\
+          sudo docker run -p 80:3000 --env-file .env ${{ secrets.AWS_REGISTRY_URL }}/${{ secrets.REPOSITORY_NAME }}:latest && \\
           sudo docker image prune -f'
