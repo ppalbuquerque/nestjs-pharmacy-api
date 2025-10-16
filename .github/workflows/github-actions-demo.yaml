@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - ci/hml
-      - feat/add-github-actions-pipeline
 permissions:
   id-token: write
   contents: read
