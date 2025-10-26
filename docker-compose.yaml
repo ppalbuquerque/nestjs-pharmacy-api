@@ -17,6 +17,7 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
+      target: dev
     container_name: pharmacy-nest-back
     environment:
       - PORT=3000
