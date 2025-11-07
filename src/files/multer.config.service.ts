@@ -5,7 +5,8 @@ import {
   MulterModuleOptions,
   MulterOptionsFactory,
 } from '@nestjs/platform-express';
-import * as multerS3 from 'multer-s3';
+import { AUTO_CONTENT_TYPE } from 'multer-s3';
+import multerS3 from 'multer-s3';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -32,7 +33,7 @@ export class MulterConfigService implements MulterOptionsFactory {
       storage: multerS3({
         s3: s3Config,
         bucket: this.configService.get<string>('BUCKET_NAME', ''),
-        contentType: multerS3.AUTO_CONTENT_TYPE,
+        contentType: AUTO_CONTENT_TYPE,
         acl: 'public-read',
         key: (req, file, cb) => {
           const fileName =

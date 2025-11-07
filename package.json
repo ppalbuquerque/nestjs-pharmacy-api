@@ -26,6 +26,7 @@
     "typeorm:show": "npx typeorm-ts-node-esm migration:show -d src/config/migrations-local-config.ts"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^2.0.63",
     "@aws-sdk/client-s3": "^3.859.0",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/common": "^10.0.0",
@@ -35,13 +36,15 @@
     "@nestjs/swagger": "^8.1.0",
     "@nestjs/typeorm": "^11.0.0",
     "@types/multer-s3": "^3.0.3",
+    "ai": "^5.0.88",
     "dotenv": "^17.2.3",
     "multer-s3": "^3.0.1",
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.1",
-    "typeorm": "^0.3.25"
+    "typeorm": "^0.3.25",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@nestjs/schematics": "^10.0.0",

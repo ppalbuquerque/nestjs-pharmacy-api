@@ -1,9 +1,9 @@
 import { DataSource } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
+import { config } from 'dotenv';
 
 import { Medication } from '../medication/medication.entitity';
 import { File } from '../files/entities/file.entity';
-import { ConfigService } from '@nestjs/config';
-import { config } from 'dotenv';
 
 config();
 
