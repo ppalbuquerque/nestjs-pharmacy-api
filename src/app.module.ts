@@ -7,12 +7,16 @@ import { MedicationSubscriber } from './medication/medication.subscriber';
 import { File } from './files/entities/file.entity';
 import { FilesModule } from './files/files.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AiSearchModule } from './ai-search/ai-search.module';
 
 @Module({
   imports: [
     MedicationModule,
     FilesModule,
-    ConfigModule.forRoot(),
+    AiSearchModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { Medication } from './medication.entitity';
@@ -7,11 +7,15 @@ import { CreateMedicationDto } from './dto/create-medication.dto';
 import { ListMedicationDTO } from './dto/list-medications.dto';
 import { UpdateMedicationDTO } from './dto/update-medication.dto';
 
+import { AiSearchService } from '../ai-search/ai-search.service';
+
 @Injectable()
 export class MedicationService {
   constructor(
     @InjectRepository(Medication)
     private medicationRepository: Repository<Medication>,
+    @Inject(AiSearchService)
+    private aiSearchService: AiSearchService,
   ) {}
 
   async list(
@@ -40,6 +44,15 @@ export class MedicationService {
 
   create(createMedicationDto: CreateMedicationDto): Promise<Medication> {
     const medication = this.medicationRepository.create(createMedicationDto);
+
+    this.aiSearchService.saveMedicationEmbedding({
+      chemicalComposition: createMedicationDto.chemicalComposition,
+      medicationName: createMedicationDto.name,
+      medicationUsefulness: createMedicationDto.usefulness,
+      stock: createMedicationDto.stockAvailability,
+      usage: createMedicationDto.usefulness,
+    });
+
     return this.medicationRepository.save(medication);
   }
 
