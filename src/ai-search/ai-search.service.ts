@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
-import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { embed, generateText, stepCountIs, tool } from 'ai';
+import { embed, streamText, stepCountIs, tool } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
 
@@ -15,7 +14,6 @@ export class AiSearchService {
   constructor(
     @InjectRepository(Medication)
     private medicationRepository: Repository<Medication>,
-    private configService: ConfigService,
     private dataSource: DataSource,
   ) {}
 
@@ -78,8 +76,8 @@ export class AiSearchService {
     };
   }
 
-  async getResponseOpenAi(generateResponseDTO: GenerateResponseDTO) {
-    const result = await generateText({
+  getResponseOpenAi(generateResponseDTO: GenerateResponseDTO) {
+    const result = streamText({
       model: openai('gpt-4.1-nano-2025-04-14'),
       prompt: generateResponseDTO.prompt,
       maxOutputTokens: 200,
@@ -99,8 +97,6 @@ export class AiSearchService {
       },
     });
 
-    return {
-      content: result.content[0],
-    };
+    return result;
   }
 }
