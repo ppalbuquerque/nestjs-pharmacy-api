@@ -1,5 +1,5 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
-
+import { Controller, Post, Body, Get, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { AiSearchService } from './ai-search.service';
 import { GenerateResponseDTO } from './dto/generate-response.dto';
 
@@ -13,7 +13,16 @@ export class AiSearchController {
   }
 
   @Post()
-  async generateResponse(@Body() generateResponseDTO: GenerateResponseDTO) {
-    return this.aiSearchService.getResponseOpenAi(generateResponseDTO);
+  async generateResponse(
+    @Body() generateResponseDTO: GenerateResponseDTO,
+    @Res() res: Response,
+  ) {
+    this.aiSearchService
+      .getResponseOpenAi(generateResponseDTO)
+      .pipeUIMessageStreamToResponse(res, {
+        headers: {
+          'Content-Encoding': 'none',
+        },
+      });
   }
 }
