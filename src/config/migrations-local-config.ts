@@ -4,6 +4,9 @@ import { config } from 'dotenv';
 
 import { Medication } from '../medication/medication.entitity';
 import { File } from '../files/entities/file.entity';
+import { CheckoutEntity } from '../checkout/checkout.entity';
+import { OrderItemEntity } from '../checkout/order-item.entity';
+import { OrderEntity } from '../checkout/order.entity';
 
 config();
 
@@ -16,7 +19,7 @@ export default new DataSource({
   username: configService.get<string>('DB_USER'),
   password: configService.get<string>('DB_PASS'),
   database: configService.get<string>('DB_NAME'),
-  entities: [Medication, File],
+  entities: [Medication, File, CheckoutEntity, OrderItemEntity, OrderEntity],
   migrations: ['src/db/migrations/*{.ts,.js}'],
   synchronize: true,
   ssl: true,

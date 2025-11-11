@@ -1,13 +1,20 @@
 import { Module } from '@nestjs/common';
-import { MedicationModule } from './medication/medication.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
+import { MedicationModule } from './medication/medication.module';
 import { Medication } from './medication/medication.entitity';
 import { MedicationSubscriber } from './medication/medication.subscriber';
+
 import { File } from './files/entities/file.entity';
 import { FilesModule } from './files/files.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+
 import { AiSearchModule } from './ai-search/ai-search.module';
+
+import { CheckoutModule } from './checkout/checkout.module';
+import { CheckoutEntity } from './checkout/checkout.entity';
+import { OrderItemEntity } from './checkout/order-item.entity';
+import { OrderEntity } from './checkout/order.entity';
 
 @Module({
   imports: [
@@ -27,12 +34,19 @@ import { AiSearchModule } from './ai-search/ai-search.module';
         username: configService.get<string>('DB_USER'),
         password: configService.get<string>('DB_PASS'),
         database: configService.get<string>('DB_NAME'),
-        entities: [Medication, File],
+        entities: [
+          Medication,
+          File,
+          CheckoutEntity,
+          OrderEntity,
+          OrderItemEntity,
+        ],
         subscribers: [MedicationSubscriber],
         synchronize: false,
         ssl: true,
       }),
     }),
+    CheckoutModule,
   ],
   controllers: [],
   providers: [],
