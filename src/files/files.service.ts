@@ -18,7 +18,6 @@ export class FilesService {
       url: file.location,
     });
 
-    console.log(file);
     return this.filesRepository.save(tempFile);
   }
 }
