@@ -13,8 +13,9 @@ import { AiSearchModule } from './ai-search/ai-search.module';
 
 import { CheckoutModule } from './checkout/checkout.module';
 import { CheckoutEntity } from './checkout/checkout.entity';
-import { OrderItemEntity } from './checkout/order-item.entity';
-import { OrderEntity } from './checkout/order.entity';
+import { OrderItemEntity } from './orders/order-item.entity';
+import { OrderEntity } from './orders/order.entity';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { OrderEntity } from './checkout/order.entity';
       }),
     }),
     CheckoutModule,
+    OrdersModule,
   ],
   controllers: [],
   providers: [],

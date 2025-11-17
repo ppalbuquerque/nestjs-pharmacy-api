@@ -5,8 +5,8 @@ import { config } from 'dotenv';
 import { Medication } from '../medication/medication.entitity';
 import { File } from '../files/entities/file.entity';
 import { CheckoutEntity } from '../checkout/checkout.entity';
-import { OrderItemEntity } from '../checkout/order-item.entity';
-import { OrderEntity } from '../checkout/order.entity';
+import { OrderItemEntity } from '../orders/order-item.entity';
+import { OrderEntity } from '../orders/order.entity';
 
 config();
 

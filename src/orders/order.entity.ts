@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { OrderItemEntity } from './order-item.entity';
-import { CheckoutEntity } from './checkout.entity';
+import { CheckoutEntity } from '../checkout/checkout.entity';
 
 export enum OrderStatus {
   COMPLETE = 'COMPLETE',
