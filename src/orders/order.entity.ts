@@ -21,7 +21,9 @@ export class OrderEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToMany(() => OrderItemEntity, (orderItem) => orderItem.order)
+  @OneToMany(() => OrderItemEntity, (orderItem) => orderItem.order, {
+    cascade: ['insert'],
+  })
   orderItems: OrderItemEntity[];
 
   @ManyToOne(() => CheckoutEntity, (checkout) => checkout.orders)
