@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { OrderItemEntity } from './order-item.entity';
-import { CheckoutEntity } from './checkout.entity';
+import { CheckoutEntity } from '../checkout/checkout.entity';
 
 export enum OrderStatus {
   COMPLETE = 'COMPLETE',
@@ -21,7 +21,9 @@ export class OrderEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToMany(() => OrderItemEntity, (orderItem) => orderItem.order)
+  @OneToMany(() => OrderItemEntity, (orderItem) => orderItem.order, {
+    cascade: ['insert'],
+  })
   orderItems: OrderItemEntity[];
 
   @ManyToOne(() => CheckoutEntity, (checkout) => checkout.orders)
