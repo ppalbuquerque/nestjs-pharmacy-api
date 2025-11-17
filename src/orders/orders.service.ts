@@ -8,6 +8,7 @@ import { CheckoutIsClosed } from 'src/checkout/exceptions/CheckoutIsClosed.excep
 import { OrderEntity, OrderStatus } from './order.entity';
 import { CreateOrderDTO } from './DTO/create-order.dto';
 import { OrderItemEntity } from './order-item.entity';
+import { OrderNotFound } from './exceptions/OrderNotFound.exception';
 
 @Injectable()
 export class OrdersService {
@@ -51,5 +52,24 @@ export class OrdersService {
     });
 
     return this.ordersRepository.save(newOrder);
+  }
+
+  async cancel(orderId: string) {
+    const order = await this.ordersRepository.findOneBy({
+      id: orderId,
+    });
+
+    if (!order || order.status === OrderStatus.CANCELLED) {
+      throw new OrderNotFound();
+    }
+
+    await this.ordersRepository.update(
+      {
+        id: orderId,
+      },
+      { status: OrderStatus.CANCELLED },
+    );
+
+    return { message: 'Order cancelled with success' };
   }
 }
