@@ -19,6 +19,15 @@ export class CheckoutEntity {
   @OneToMany(() => OrderEntity, (order) => order.checkout)
   orders: OrderEntity[];
 
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    name: 'intial_value',
+    default: 0,
+  })
+  initialValue: number;
+
   @Column({ type: 'date', nullable: true })
   closedAt: Date;
 

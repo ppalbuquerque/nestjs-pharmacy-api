@@ -14,7 +14,7 @@ export class CheckoutService {
     private checkoutRepository: Repository<CheckoutEntity>,
   ) {}
 
-  async create() {
+  async create(initialValue: number) {
     const checkoutOpened = await this.checkoutRepository.findOneBy({
       isOpen: true,
     });
@@ -23,6 +23,7 @@ export class CheckoutService {
 
     const checkout = this.checkoutRepository.create({
       isOpen: true,
+      initialValue,
     });
 
     return this.checkoutRepository.save(checkout);
