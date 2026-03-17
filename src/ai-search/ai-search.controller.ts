@@ -8,8 +8,12 @@ export class AiSearchController {
   constructor(private aiSearchService: AiSearchService) {}
 
   @Get()
-  async healCheck() {
-    return { content: 'Api is running' };
+  async healthCheck() {
+    return {
+      status: 'ok',
+      message: 'API is running',
+      version: '0.1',
+    };
   }
 
   @Post()
