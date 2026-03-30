@@ -19,6 +19,7 @@ const mockQueryBuilder = {
 
 const mockOrdersRepository = {
   findOneBy: jest.fn(),
+  findOne: jest.fn(),
   create: jest.fn(),
   save: jest.fn(),
   update: jest.fn(),
@@ -181,6 +182,34 @@ describe('OrdersService', () => {
       await service.findAll({});
 
       expect(mockQueryBuilder.andWhere).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('findById()', () => {
+    it('should throw OrderNotFound when order does not exist', async () => {
+      mockOrdersRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.findById('non-existent-uuid')).rejects.toThrow(
+        OrderNotFound,
+      );
+    });
+
+    it('should return order with items when found', async () => {
+      const mockOrder = {
+        id: 'uuid-1',
+        totalValue: 100,
+        status: OrderStatus.COMPLETE,
+        orderItems: [],
+      };
+      mockOrdersRepository.findOne.mockResolvedValue(mockOrder);
+
+      const result = await service.findById('uuid-1');
+
+      expect(mockOrdersRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 'uuid-1' },
+        relations: { orderItems: { medication: true } },
+      });
+      expect(result).toEqual(mockOrder);
     });
   });
 

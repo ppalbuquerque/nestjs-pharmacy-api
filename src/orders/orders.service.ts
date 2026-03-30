@@ -97,6 +97,19 @@ export class OrdersService {
     return { orders, total, limit, offset };
   }
 
+  async findById(orderId: string) {
+    const order = await this.ordersRepository.findOne({
+      where: { id: orderId },
+      relations: { orderItems: { medication: true } },
+    });
+
+    if (!order) {
+      throw new OrderNotFound();
+    }
+
+    return order;
+  }
+
   async cancel(orderId: string) {
     const order = await this.ordersRepository.findOneBy({
       id: orderId,

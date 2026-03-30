@@ -17,6 +17,11 @@ export class OrdersController {
     return this.ordersService.create(createOrderDTO);
   }
 
+  @Get(':id')
+  async getOrder(@Param('id') id: string) {
+    return this.ordersService.findById(id);
+  }
+
   @Put('cancel/:id')
   async cancelOrder(@Param('id') id: string) {
     return this.ordersService.cancel(id);
