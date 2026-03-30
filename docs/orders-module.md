@@ -8,10 +8,55 @@ O módulo `orders` gerencia a criação e cancelamento de pedidos dentro de uma 
 
 ## Endpoints
 
-| Método | Rota                  | Descrição                  |
-|--------|-----------------------|----------------------------|
-| POST   | `/orders`             | Cria um novo pedido        |
-| PUT    | `/orders/cancel/:id`  | Cancela um pedido existente |
+| Método | Rota                  | Descrição                        |
+|--------|---|----|
+| GET    | `/orders`             | Lista pedidos paginados com filtros |
+| POST   | `/orders`             | Cria um novo pedido              |
+| PUT    | `/orders/cancel/:id`  | Cancela um pedido existente      |
+
+---
+
+## Fluxo de Listagem de Pedidos (`findAll`)
+
+```
+GET /orders?limit=10&offset=0&status=COMPLETE&checkoutId=uuid&createdAtFrom=ISO&createdAtTo=ISO
+  │
+  ├─ Aplica filtros opcionais via QueryBuilder
+  │     ├─ status          → WHERE order.status = :status
+  │     ├─ checkoutId      → WHERE order.checkoutId = :checkoutId
+  │     ├─ createdAtFrom   → WHERE order.createdAt >= :createdAtFrom
+  │     └─ createdAtTo     → WHERE order.createdAt <= :createdAtTo
+  │
+  ├─ Aplica paginação: SKIP offset, TAKE limit
+  │
+  └─ Retorna { orders, total, limit, offset }
+```
+
+**Query params (todos opcionais):**
+
+| Parâmetro | Tipo | Padrão | Descrição |
+|---|---|---|---|
+| `limit` | number | 10 | Itens por página (mín: 1) |
+| `offset` | number | 0 | Deslocamento (mín: 0) |
+| `status` | `COMPLETE \| CANCELLED \| PROCESSING` | — | Filtro por status |
+| `checkoutId` | UUID | — | Filtro pelo checkout associado |
+| `createdAtFrom` | ISO 8601 | — | Data inicial do range de criação |
+| `createdAtTo` | ISO 8601 | — | Data final do range de criação |
+
+**Resposta:**
+
+```json
+{
+  "orders": [
+    { "id": "uuid", "totalValue": 150.50, "status": "COMPLETE", "createdAt": "2026-01-01T00:00:00.000Z" }
+  ],
+  "total": 42,
+  "limit": 10,
+  "offset": 0
+}
+```
+
+> **Nota:** Retorna apenas `id`, `totalValue`, `status` e `createdAt` — campos de itens e pagamento não são incluídos na listagem.
 
 ---
 
@@ -159,6 +204,14 @@ Arquivo: `src/orders/orders.service.spec.ts`
 |------------------------------------------------------|--------|
 | `create()` → lança `CheckoutIsClosed` sem checkout aberto | ✅ |
 | `cancel()` → lança `OrderNotFound` para id inexistente    | ✅ |
+| `findAll()` → retorna paginação com limit/offset padrão   | ✅ |
+| `findAll()` → aplica limit e offset customizados          | ✅ |
+| `findAll()` → filtra por status                           | ✅ |
+| `findAll()` → filtra por checkoutId                       | ✅ |
+| `findAll()` → filtra por createdAtFrom                    | ✅ |
+| `findAll()` → filtra por createdAtTo                      | ✅ |
+| `findAll()` → filtra por range de datas (from + to)       | ✅ |
+| `findAll()` → sem filtros não aplica andWhere             | ✅ |
 
 **Lacunas identificadas:**
 
