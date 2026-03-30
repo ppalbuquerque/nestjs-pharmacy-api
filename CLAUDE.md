@@ -111,6 +111,24 @@ All new code must be validated by tests. Follow the Red → Green → Refactor c
 
 The decisions behind this structure (tooling choices, mock patterns, directory conventions) are documented in `docs/adr/ADR-001-test-structure.md`.
 
+## Dependency Rules
+
+Before using any external library in the code, verify it is declared in `package.json`.
+
+- If the package is **already listed**: use it normally.
+- If the package is **not listed**: add it to the appropriate section (`dependencies` or `devDependencies`) and run `npm install` before proceeding.
+
+Never import a package that is not declared in `package.json`, even if it happens to be installed transitively.
+
+## Documentation Rules
+
+After implementing any new feature (endpoint, service method, business rule, exception), update the corresponding documentation file in `docs/` before closing the task.
+
+For each module doc (`docs/<module>-module.md`), update:
+- The **Endpoints** table with the new route
+- A **flow section** describing inputs, filters, and output
+- The **test coverage table** with the new scenarios
+
 ## Environment Variables
 
 Required in `.env`:
