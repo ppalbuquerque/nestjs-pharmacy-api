@@ -11,6 +11,7 @@ O módulo `orders` gerencia a criação e cancelamento de pedidos dentro de uma 
 | Método | Rota                  | Descrição                        |
 |--------|---|----|
 | GET    | `/orders`             | Lista pedidos paginados com filtros |
+| GET    | `/orders/:id`         | Retorna detalhes de um pedido    |
 | POST   | `/orders`             | Cria um novo pedido              |
 | PUT    | `/orders/cancel/:id`  | Cancela um pedido existente      |
 
@@ -57,6 +58,41 @@ GET /orders?limit=10&offset=0&status=COMPLETE&checkoutId=uuid&createdAtFrom=ISO&
 ```
 
 > **Nota:** Retorna apenas `id`, `totalValue`, `status` e `createdAt` — campos de itens e pagamento não são incluídos na listagem.
+
+---
+
+## Fluxo de Detalhes de Pedido (`findById`)
+
+```
+GET /orders/:id
+  │
+  ├─ Busca order por id com relações: orderItems → medication
+  │     └─ Não encontrado → lança OrderNotFound (HTTP 404, code '004')
+  │
+  └─ Retorna OrderEntity completo com itens e medicamentos
+```
+
+**Resposta:**
+
+```json
+{
+  "id": "uuid",
+  "totalValue": 150.50,
+  "paymentValue": 200.00,
+  "status": "COMPLETE",
+  "createdAt": "2026-01-01T00:00:00.000Z",
+  "updatedAt": "2026-01-01T00:00:00.000Z",
+  "orderItems": [
+    {
+      "id": "item-uuid",
+      "amount": 2,
+      "totalValue": 75.25,
+      "boxType": "unit",
+      "medication": { "id": 123, "name": "..." }
+    }
+  ]
+}
+```
 
 ---
 
@@ -203,6 +239,8 @@ Arquivo: `src/orders/orders.service.spec.ts`
 | Cenário                                              | Status |
 |------------------------------------------------------|--------|
 | `create()` → lança `CheckoutIsClosed` sem checkout aberto | ✅ |
+| `findById()` → lança `OrderNotFound` para id inexistente  | ✅ |
+| `findById()` → retorna order com itens e medication       | ✅ |
 | `cancel()` → lança `OrderNotFound` para id inexistente    | ✅ |
 | `findAll()` → retorna paginação com limit/offset padrão   | ✅ |
 | `findAll()` → aplica limit e offset customizados          | ✅ |
