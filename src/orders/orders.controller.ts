@@ -1,10 +1,16 @@
-import { Body, Controller, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDTO } from './DTO/create-order.dto';
+import { ListOrdersDTO } from './DTO/list-orders.dto';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private ordersService: OrdersService) {}
+
+  @Get()
+  async listOrders(@Query() filters: ListOrdersDTO) {
+    return this.ordersService.findAll(filters);
+  }
 
   @Post()
   async createOrder(@Body() createOrderDTO: CreateOrderDTO) {

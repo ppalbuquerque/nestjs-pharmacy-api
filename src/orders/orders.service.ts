@@ -7,6 +7,7 @@ import { CheckoutIsClosed } from 'src/checkout/exceptions/CheckoutIsClosed.excep
 
 import { OrderEntity, OrderStatus } from './order.entity';
 import { CreateOrderDTO } from './DTO/create-order.dto';
+import { ListOrdersDTO } from './DTO/list-orders.dto';
 import { OrderItemEntity } from './order-item.entity';
 import { OrderNotFound } from './exceptions/OrderNotFound.exception';
 
@@ -52,6 +53,48 @@ export class OrdersService {
     });
 
     return this.ordersRepository.save(newOrder);
+  }
+
+  async findAll(filters: ListOrdersDTO) {
+    const {
+      limit = 10,
+      offset = 0,
+      status,
+      checkoutId,
+      createdAtFrom,
+      createdAtTo,
+    } = filters;
+
+    const query = this.ordersRepository
+      .createQueryBuilder('order')
+      .select([
+        'order.id',
+        'order.totalValue',
+        'order.status',
+        'order.createdAt',
+      ]);
+
+    if (status) {
+      query.andWhere('order.status = :status', { status });
+    }
+
+    if (checkoutId) {
+      query.andWhere('order.checkoutId = :checkoutId', { checkoutId });
+    }
+
+    if (createdAtFrom) {
+      query.andWhere('order.createdAt >= :createdAtFrom', { createdAtFrom });
+    }
+
+    if (createdAtTo) {
+      query.andWhere('order.createdAt <= :createdAtTo', { createdAtTo });
+    }
+
+    query.skip(offset).take(limit);
+
+    const [orders, total] = await query.getManyAndCount();
+
+    return { orders, total, limit, offset };
   }
 
   async cancel(orderId: string) {
