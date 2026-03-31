@@ -18,6 +18,11 @@ export class CheckoutController {
     return this.checkoutService.resume();
   }
 
+  @Get('/status')
+  async getCheckoutStatus() {
+    return this.checkoutService.getStatus();
+  }
+
   @Post('/close')
   async closeCheckout(@Body() closeCheckoutDTO: CloseCheckoutDTO) {
     return this.checkoutService.close(
