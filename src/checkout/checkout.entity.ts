@@ -28,6 +28,16 @@ export class CheckoutEntity {
   })
   initialValue: number;
 
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    name: 'closing_value',
+    nullable: true,
+    default: null,
+  })
+  closingValue: number | null;
+
   @Column({ type: 'date', nullable: true })
   closedAt: Date;
 
