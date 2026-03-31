@@ -7,6 +7,7 @@ import { CheckoutIsOpen } from './exceptions/CheckoutIsOpen.exception';
 import { CheckoutNotFound } from './exceptions/CheckoutNotFound.exception';
 import { CheckoutIsClosed } from './exceptions/CheckoutIsClosed.exception';
 import { CheckoutNotOpen } from './exceptions/CheckoutNotOpen.exception';
+import { CheckoutDoesNotExist } from './exceptions/CheckoutDoesNotExist.exception';
 
 const mockQueryBuilder = {
   leftJoin: jest.fn().mockReturnThis(),
@@ -20,6 +21,7 @@ const mockQueryBuilder = {
 
 const mockCheckoutRepository = {
   findOneBy: jest.fn(),
+  find: jest.fn(),
   create: jest.fn(),
   save: jest.fn(),
   createQueryBuilder: jest.fn().mockReturnValue(mockQueryBuilder),
@@ -165,6 +167,39 @@ describe('CheckoutService', () => {
         totalOrderCount: 0,
         totalOrdersValue: 0,
         grandTotal: 500,
+      });
+    });
+  });
+
+  describe('getStatus()', () => {
+    it('should throw CheckoutDoesNotExist when no checkouts exist', async () => {
+      mockCheckoutRepository.find.mockResolvedValue([]);
+
+      await expect(service.getStatus()).rejects.toThrow(CheckoutDoesNotExist);
+    });
+
+    it('should return id, isOpen, createdAt, updatedAt and closedAt of the most recent checkout', async () => {
+      const mockCheckout = {
+        id: 'uuid-1',
+        isOpen: false,
+        createdAt: new Date('2026-01-01T08:00:00Z'),
+        updatedAt: new Date('2026-01-01T18:00:00Z'),
+        closedAt: new Date('2026-01-01T18:00:00Z'),
+      };
+      mockCheckoutRepository.find.mockResolvedValue([mockCheckout]);
+
+      const result = await service.getStatus();
+
+      expect(mockCheckoutRepository.find).toHaveBeenCalledWith({
+        order: { createdAt: 'DESC' },
+        take: 1,
+      });
+      expect(result).toEqual({
+        id: mockCheckout.id,
+        isOpen: mockCheckout.isOpen,
+        createdAt: mockCheckout.createdAt,
+        updatedAt: mockCheckout.updatedAt,
+        closedAt: mockCheckout.closedAt,
       });
     });
   });

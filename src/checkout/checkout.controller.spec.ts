@@ -3,11 +3,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CheckoutController } from './checkout.controller';
 import { CheckoutService } from './checkout.service';
 import { CheckoutNotOpen } from './exceptions/CheckoutNotOpen.exception';
+import { CheckoutDoesNotExist } from './exceptions/CheckoutDoesNotExist.exception';
 
 const mockCheckoutService = {
   create: jest.fn(),
   close: jest.fn(),
   resume: jest.fn(),
+  getStatus: jest.fn(),
 };
 
 describe('CheckoutController', () => {
@@ -77,6 +79,30 @@ describe('CheckoutController', () => {
       mockCheckoutService.resume.mockRejectedValue(new CheckoutNotOpen());
 
       await expect(controller.getCheckoutResume()).rejects.toThrow(CheckoutNotOpen);
+    });
+  });
+
+  describe('getCheckoutStatus()', () => {
+    it('should call service.getStatus and return result', async () => {
+      const mockResult = {
+        id: 'uuid-1',
+        isOpen: false,
+        createdAt: new Date('2026-01-01T08:00:00Z'),
+        updatedAt: new Date('2026-01-01T18:00:00Z'),
+        closedAt: new Date('2026-01-01T18:00:00Z'),
+      };
+      mockCheckoutService.getStatus.mockResolvedValue(mockResult);
+
+      const result = await controller.getCheckoutStatus();
+
+      expect(mockCheckoutService.getStatus).toHaveBeenCalled();
+      expect(result).toEqual(mockResult);
+    });
+
+    it('should propagate CheckoutDoesNotExist exception from service', async () => {
+      mockCheckoutService.getStatus.mockRejectedValue(new CheckoutDoesNotExist());
+
+      await expect(controller.getCheckoutStatus()).rejects.toThrow(CheckoutDoesNotExist);
     });
   });
 });
