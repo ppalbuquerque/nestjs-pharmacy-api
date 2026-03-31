@@ -7,6 +7,7 @@ import { CheckoutIsOpen } from './exceptions/CheckoutIsOpen.exception';
 import { CheckoutNotFound } from './exceptions/CheckoutNotFound.exception';
 import { CheckoutIsClosed } from './exceptions/CheckoutIsClosed.exception';
 import { CheckoutNotOpen } from './exceptions/CheckoutNotOpen.exception';
+import { CheckoutDoesNotExist } from './exceptions/CheckoutDoesNotExist.exception';
 
 @Injectable()
 export class CheckoutService {
@@ -82,6 +83,23 @@ export class CheckoutService {
       totalOrderCount: Number(raw.totalOrderCount),
       totalOrdersValue,
       grandTotal: totalOrdersValue + initialValue,
+    };
+  }
+
+  async getStatus() {
+    const [checkout] = await this.checkoutRepository.find({
+      order: { createdAt: 'DESC' },
+      take: 1,
+    });
+
+    if (!checkout) throw new CheckoutDoesNotExist();
+
+    return {
+      id: checkout.id,
+      isOpen: checkout.isOpen,
+      createdAt: checkout.createdAt,
+      updatedAt: checkout.updatedAt,
+      closedAt: checkout.closedAt,
     };
   }
 }

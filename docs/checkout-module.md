@@ -12,6 +12,7 @@ O módulo `checkout` gerencia o ciclo de vida de sessões de caixa. Cada sessão
 |--------|------------------------|------------------------------------|
 | POST   | `/checkout`            | Abre uma nova sessão de caixa      |
 | GET    | `/checkout/resume`     | Retorna resumo do caixa aberto     |
+| GET    | `/checkout/status`     | Retorna status do checkout mais recente |
 | POST   | `/checkout/close`      | Fecha a sessão de caixa ativa      |
 
 ---
@@ -81,6 +82,33 @@ GET /checkout/resume
 ```
 
 > **Nota:** Pedidos com status `CANCELLED` são excluídos do `totalOrderCount` e do `totalOrdersValue`.
+
+---
+
+## Fluxo de Status do Caixa (`getStatus`)
+
+```
+GET /checkout/status
+  │
+  ├─ Busca checkout mais recente (ORDER BY createdAt DESC)
+  │     └─ Nenhum encontrado → lança CheckoutDoesNotExist (HTTP 404, code '006')
+  │
+  └─ Retorna id, isOpen, createdAt, updatedAt, closedAt
+```
+
+**Resposta (200):**
+
+```json
+{
+  "id": "uuid",
+  "isOpen": false,
+  "createdAt": "2026-01-01T08:00:00.000Z",
+  "updatedAt": "2026-01-01T18:00:00.000Z",
+  "closedAt": "2026-01-01T18:00:00.000Z"
+}
+```
+
+> **Nota:** Não há distinção de lógica se o checkout estiver aberto ou fechado — retorna sempre o mais recente independentemente de `isOpen`.
 
 ---
 
@@ -166,6 +194,7 @@ CheckoutEntity (1) ──── (N) OrderEntity
 | `CheckoutNotFound`  | 404  | '002' | Checkout has not been found    | Checkout não encontrado pelo ID ao fechar           |
 | `CheckoutIsClosed`  | 403  | '003' | The checkout is already closed | Tentativa de fechar um checkout já encerrado        |
 | `CheckoutNotOpen`   | 404  | '005' | There is no open checkout      | Consulta de resumo sem checkout aberto              |
+| `CheckoutDoesNotExist` | 404 | '006' | There are no checkouts      | Consulta de status sem nenhum checkout na base      |
 
 ---
 
@@ -206,6 +235,10 @@ O `CheckoutModule` importa e injeta:
 | Controller → `closeCheckout` delega para `service.close` com id e closingValue  | ✅     |
 | Controller → `getCheckoutResume` delega para `service.resume`                   | ✅     |
 | Controller → `getCheckoutResume` propaga `CheckoutNotOpen` do serviço            | ✅     |
+| `getStatus()` → lança `CheckoutDoesNotExist` quando não há checkouts na base     | ✅     |
+| `getStatus()` → retorna id, isOpen, createdAt, updatedAt, closedAt do checkout mais recente | ✅ |
+| Controller → `getCheckoutStatus` delega para `service.getStatus`                 | ✅     |
+| Controller → `getCheckoutStatus` propaga `CheckoutDoesNotExist` do serviço       | ✅     |
 
 ---
 
