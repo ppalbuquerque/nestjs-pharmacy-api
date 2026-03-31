@@ -6,6 +6,7 @@ import { CheckoutEntity } from './checkout.entity';
 import { CheckoutIsOpen } from './exceptions/CheckoutIsOpen.exception';
 import { CheckoutNotFound } from './exceptions/CheckoutNotFound.exception';
 import { CheckoutIsClosed } from './exceptions/CheckoutIsClosed.exception';
+import { CheckoutNotOpen } from './exceptions/CheckoutNotOpen.exception';
 
 @Injectable()
 export class CheckoutService {
@@ -29,7 +30,7 @@ export class CheckoutService {
     return this.checkoutRepository.save(checkout);
   }
 
-  async close(checkoutId: string) {
+  async close(checkoutId: string, closingValue: number | null) {
     const checkout = await this.checkoutRepository.findOneBy({
       id: checkoutId,
     });
@@ -43,7 +44,44 @@ export class CheckoutService {
     }
 
     checkout.isOpen = false;
+    checkout.closedAt = new Date();
+    checkout.closingValue = closingValue;
 
     return this.checkoutRepository.save(checkout);
+  }
+
+  async resume() {
+    const raw = await this.checkoutRepository
+      .createQueryBuilder('checkout')
+      .leftJoin('checkout.orders', 'order')
+      .select('checkout.id', 'id')
+      .addSelect('checkout.createdAt', 'openedAt')
+      .addSelect('checkout.initialValue', 'initialValue')
+      .addSelect(
+        `COUNT(CASE WHEN order.status != 'CANCELLED' THEN 1 END)`,
+        'totalOrderCount',
+      )
+      .addSelect(
+        `COALESCE(SUM(CASE WHEN order.status != 'CANCELLED' THEN order.totalValue ELSE 0 END), 0)`,
+        'totalOrdersValue',
+      )
+      .where('checkout.isOpen = :isOpen', { isOpen: true })
+      .groupBy('checkout.id')
+      .addGroupBy('checkout.createdAt')
+      .addGroupBy('checkout.initialValue')
+      .getRawOne();
+
+    if (!raw) throw new CheckoutNotOpen();
+
+    const totalOrdersValue = Number(raw.totalOrdersValue);
+    const initialValue = Number(raw.initialValue);
+
+    return {
+      openedAt: raw.openedAt,
+      initialValue,
+      totalOrderCount: Number(raw.totalOrderCount),
+      totalOrdersValue,
+      grandTotal: totalOrdersValue + initialValue,
+    };
   }
 }
