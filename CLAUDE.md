@@ -45,6 +45,8 @@ npm run typeorm:show                               # Show migration status
 npm run typeorm:drop                               # Drop entire schema
 ```
 
+> **Note:** The migration CLI uses `typeorm-ts-node-commonjs`. The project is CommonJS (no `"type": "module"` in `package.json`) — never switch these scripts to `typeorm-ts-node-esm`.
+
 ### Docker
 ```bash
 docker-compose up       # Start PostgreSQL + app (local dev)
@@ -111,6 +113,21 @@ All new code must be validated by tests. Follow the Red → Green → Refactor c
 
 The decisions behind this structure (tooling choices, mock patterns, directory conventions) are documented in `docs/adr/ADR-001-test-structure.md`.
 
+## Migration Rules
+
+Any change to a TypeORM entity (add/remove/rename column, change type, add relation) **requires a migration**. Follow these rules strictly:
+
+1. **Never write migration files manually.** Always generate them from entity changes:
+   ```bash
+   npm run typeorm:generate -- --name=DescriptiveMigrationName
+   ```
+2. **Always run the migration after generating it.** A migration that exists but has not been executed is not done:
+   ```bash
+   npm run typeorm:migrate
+   ```
+3. **The task is only complete when `typeorm:migrate` runs successfully** with no errors and confirms the migration was executed.
+4. If the generate command fails, diagnose the root cause — do not create the migration file by hand as a workaround.
+
 ## Dependency Rules
 
 Before using any external library in the code, verify it is declared in `package.json`.
@@ -121,6 +138,8 @@ Before using any external library in the code, verify it is declared in `package
 Never import a package that is not declared in `package.json`, even if it happens to be installed transitively.
 
 ## Documentation Rules
+
+Before starting any development on a feature of an existing module, read the corresponding documentation file at `docs/<module>-module.md` to load the module's context: endpoints, business rules, data model, exceptions, and test coverage. This avoids redundant exploration and ensures decisions are consistent with the existing design.
 
 After implementing any new feature (endpoint, service method, business rule, exception), update the corresponding documentation file in `docs/` before closing the task.
 
