@@ -148,6 +148,22 @@ For each module doc (`docs/<module>-module.md`), update:
 - A **flow section** describing inputs, filters, and output
 - The **test coverage table** with the new scenarios
 
+### API Reference (`docs/api-reference.md`)
+
+`docs/api-reference.md` is the **single source of truth for the frontend team**. It must always reflect the current state of the API. Update it whenever any of the following changes:
+
+- A new endpoint is added or removed
+- A request body field is added, removed, renamed, or changes type
+- A response field changes shape, type, or nullability
+- A new domain exception is introduced or an existing one changes its `errorCode`, HTTP status, or message
+- A new module is created
+
+For each change, update the relevant section in `docs/api-reference.md`:
+- Endpoint table in the module section
+- Request/response schema
+- Error table within the module section
+- The global error table in section 6 (if a new `errorCode` was added)
+
 ## Environment Variables
 
 Required in `.env`:
