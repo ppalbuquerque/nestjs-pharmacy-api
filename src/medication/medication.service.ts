@@ -68,7 +68,7 @@ export class MedicationService {
   }
 
   async search(query: string): Promise<Medication[]> {
-    const result = await this.medicationRepository.query(
+    const rows = await this.medicationRepository.query(
       `
       select * from medication where full_text_search @@ plainto_tsquery('portuguese', unaccent($1))
       UNION
@@ -81,6 +81,23 @@ export class MedicationService {
       [query, `%${query}%`],
     );
 
-    return result;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return rows.map((row: any) => {
+      const medication = new Medication();
+      medication.id = row.id;
+      medication.name = row.name;
+      medication.chemicalComposition = row.chemical_composition;
+      medication.stockAvailability = row.stock_availability;
+      medication.shelfLocation = row.shelf_location;
+      medication.boxPrice = row.box_price;
+      medication.unitPrice = row.unit_price;
+      medication.usefulness = row.usefulness;
+      medication.samplePhotoUrl = row.sample_photo_url;
+      medication.dosageInstructions = row.dosage_instructions;
+      medication.fullTextSearch = row.full_text_search;
+      medication.createdAt = new Date(row.created_at);
+      medication.updatedAt = new Date(row.updated_at);
+      return medication;
+    });
   }
 }
