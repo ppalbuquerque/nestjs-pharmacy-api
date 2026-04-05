@@ -287,6 +287,26 @@ Utiliza full-text search em português (tsvector) no banco.
 
 **Response `200`** — array de objetos `Medication`.
 
+```json
+[
+  {
+    "id": 11,
+    "name": "Macrodantina",
+    "chemicalComposition": "Nitrofuratoína",
+    "stockAvailability": 10,
+    "shelfLocation": "3F",
+    "boxPrice": "10.00",
+    "unitPrice": "10.00",
+    "usefulness": "agente antibacteriano...",
+    "samplePhotoUrl": "BLANK",
+    "dosageInstructions": "De 8 em 8 horas",
+    "fullTextSearch": null,
+    "createdAt": "2025-11-07T18:58:08.394Z",
+    "updatedAt": "2025-11-07T18:58:08.394Z"
+  }
+]
+```
+
 ---
 
 ### `GET /medication/:id` — Buscar por ID
