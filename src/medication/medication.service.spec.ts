@@ -41,8 +41,8 @@ describe('MedicationService', () => {
       chemical_composition: 'Nitrofuratoína',
       stock_availability: 10,
       shelf_location: '3F',
-      box_price: '10.00',
-      unit_price: '10.00',
+      box_price: 1000,
+      unit_price: 1000,
       usefulness: 'agente antibacteriano',
       sample_photo_url: 'BLANK',
       dosage_instructions: 'De 8 em 8 horas',
@@ -59,8 +59,8 @@ describe('MedicationService', () => {
       expect(result[0].chemicalComposition).toBe('Nitrofuratoína');
       expect(result[0].stockAvailability).toBe(10);
       expect(result[0].shelfLocation).toBe('3F');
-      expect(result[0].boxPrice).toBe('10.00');
-      expect(result[0].unitPrice).toBe('10.00');
+      expect(result[0].boxPrice).toBe(1000);
+      expect(result[0].unitPrice).toBe(1000);
       expect(result[0].samplePhotoUrl).toBe('BLANK');
       expect(result[0].dosageInstructions).toBe('De 8 em 8 horas');
       expect(result[0].fullTextSearch).toBeNull();
