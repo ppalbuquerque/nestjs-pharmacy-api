@@ -23,10 +23,10 @@ export class Medication {
   @Column({ type: 'varchar', name: 'shelf_location' })
   shelfLocation: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, name: 'box_price' })
+  @Column({ type: 'int', name: 'box_price' })
   boxPrice: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, name: 'unit_price' })
+  @Column({ type: 'int', name: 'unit_price' })
   unitPrice: number;
 
   @Column({ type: 'varchar' })

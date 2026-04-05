@@ -195,8 +195,8 @@ Gerencia pedidos dentro de uma sessão de caixa ativa.
       "medication": {
         "id": 1,
         "name": "Dipirona 500mg",
-        "unitPrice": 60.00,
-        "boxPrice": 480.00
+        "unitPrice": 6000,
+        "boxPrice": 48000
       }
     }
   ]
@@ -295,8 +295,8 @@ Utiliza full-text search em português (tsvector) no banco.
     "chemicalComposition": "Nitrofuratoína",
     "stockAvailability": 10,
     "shelfLocation": "3F",
-    "boxPrice": "10.00",
-    "unitPrice": "10.00",
+    "boxPrice": 1000,
+    "unitPrice": 1000,
     "usefulness": "agente antibacteriano...",
     "samplePhotoUrl": "BLANK",
     "dosageInstructions": "De 8 em 8 horas",
@@ -331,8 +331,8 @@ Utiliza full-text search em português (tsvector) no banco.
   "chemicalComposition": "Metamizol sódico",
   "stockAvailability": 200,
   "shelfLocation": "A-12",
-  "boxPrice": 48.00,
-  "unitPrice": 6.00,
+  "boxPrice": 4800,
+  "unitPrice": 600,
   "usefulness": "Analgésico e antitérmico",
   "dosageInstructions": "1 comprimido a cada 6 horas",
   "samplePhotoUrl": "https://..."
@@ -380,8 +380,8 @@ Todos os campos são obrigatórios.
 | `chemicalComposition` | string | Composição química / princípio ativo |
 | `stockAvailability` | integer | Quantidade em estoque |
 | `shelfLocation` | string | Localização na prateleira |
-| `boxPrice` | number | Preço por caixa |
-| `unitPrice` | number | Preço por unidade |
+| `boxPrice` | integer | Preço por caixa em centavos (ex: 4800 = R$ 48,00) |
+| `unitPrice` | integer | Preço por unidade em centavos (ex: 600 = R$ 6,00) |
 | `usefulness` | string | Indicação terapêutica |
 | `dosageInstructions` | string | Posologia |
 | `samplePhotoUrl` | string | URL da foto do produto |
