@@ -1,9 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateMedicationDTO {
   @ApiProperty()
@@ -30,14 +26,14 @@ export class UpdateMedicationDTO {
   @IsString()
   shelfLocation?: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: 'integer', required: false })
   @IsOptional()
-  @IsNumber()
+  @IsInt()
   boxPrice?: number;
 
-  @ApiProperty()
+  @ApiProperty({ type: 'integer', required: false })
   @IsOptional()
-  @IsNumber()
+  @IsInt()
   unitPrice?: number;
 
   @ApiProperty()
