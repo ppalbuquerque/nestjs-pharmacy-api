@@ -50,8 +50,8 @@ GET /medication?limit=10&offset=0
       "chemicalComposition": "Acetaminophen",
       "stockAvailability": 100,
       "shelfLocation": "A1",
-      "boxPrice": "15.90",
-      "unitPrice": "1.50",
+      "boxPrice": 1590,
+      "unitPrice": 150,
       "usefulness": "Analgésico e antitérmico",
       "samplePhotoUrl": "https://...",
       "dosageInstructions": "Tomar 1 comprimido a cada 6 horas",
@@ -98,8 +98,8 @@ GET /medication/search?q=paracetamol
     "chemicalComposition": "Nitrofuratoína",
     "stockAvailability": 10,
     "shelfLocation": "3F",
-    "boxPrice": "10.00",
-    "unitPrice": "10.00",
+    "boxPrice": 1000,
+    "unitPrice": 1000,
     "usefulness": "agente antibacteriano indicado no tratamento de infecções urinárias agudas e crônicas",
     "samplePhotoUrl": "BLANK",
     "dosageInstructions": "De 8 em 8 horas",
@@ -151,8 +151,8 @@ POST /medication
   "chemicalComposition": "Acetaminophen",
   "stockAvailability": 100,
   "shelfLocation": "A1",
-  "boxPrice": 15.90,
-  "unitPrice": 1.50,
+  "boxPrice": 1590,
+  "unitPrice": 150,
   "usefulness": "Analgésico e antitérmico",
   "dosageInstructions": "Tomar 1 comprimido a cada 6 horas",
   "samplePhotoUrl": "https://..."
@@ -183,7 +183,7 @@ PUT /medication
   "id": 1,
   "name": "Paracetamol 500mg",
   "stockAvailability": 200,
-  "boxPrice": 18.00
+  "boxPrice": 1800
 }
 ```
 
@@ -216,8 +216,8 @@ DELETE /medication/:id
 | `chemicalComposition`| varchar         | `chemical_composition` | Composição química                                   |
 | `stockAvailability`  | int             | `stock_availability` | Quantidade em estoque                                  |
 | `shelfLocation`      | varchar         | `shelf_location`     | Localização na prateleira                              |
-| `boxPrice`           | decimal(10,2)   | `box_price`          | Preço por caixa                                        |
-| `unitPrice`          | decimal(10,2)   | `unit_price`         | Preço por unidade                                      |
+| `boxPrice`           | integer (centavos) | `box_price`       | Preço por caixa em centavos (ex: 1590 = R$ 15,90)      |
+| `unitPrice`          | integer (centavos) | `unit_price`      | Preço por unidade em centavos (ex: 150 = R$ 1,50)      |
 | `usefulness`         | varchar         | `usefulness`         | Indicação terapêutica (usada no trigram e full-text)   |
 | `samplePhotoUrl`     | varchar         | `sample_photo_url`   | URL da foto do medicamento                             |
 | `dosageInstructions` | text            | `dosage_instructions`| Instruções de posologia                                |
