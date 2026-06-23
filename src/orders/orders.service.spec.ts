@@ -8,10 +8,12 @@ import { CheckoutEntity } from '../checkout/checkout.entity';
 import { CheckoutIsClosed } from '../checkout/exceptions/CheckoutIsClosed.exception';
 import { OrderNotFound } from './exceptions/OrderNotFound.exception';
 import { BoxType } from './DTO/order-item.dto';
+import { OrderSort } from './DTO/list-orders.dto';
 
 const mockQueryBuilder = {
   select: jest.fn().mockReturnThis(),
   andWhere: jest.fn().mockReturnThis(),
+  orderBy: jest.fn().mockReturnThis(),
   skip: jest.fn().mockReturnThis(),
   take: jest.fn().mockReturnThis(),
   getManyAndCount: jest.fn(),
@@ -42,6 +44,7 @@ describe('OrdersService', () => {
     mockOrdersRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
     mockQueryBuilder.select.mockReturnThis();
     mockQueryBuilder.andWhere.mockReturnThis();
+    mockQueryBuilder.orderBy.mockReturnThis();
     mockQueryBuilder.skip.mockReturnThis();
     mockQueryBuilder.take.mockReturnThis();
 
@@ -88,8 +91,18 @@ describe('OrdersService', () => {
 
   describe('findAll()', () => {
     const mockOrders = [
-      { id: 'uuid-1', totalValue: 100, status: OrderStatus.COMPLETE, createdAt: new Date('2026-01-01') },
-      { id: 'uuid-2', totalValue: 200, status: OrderStatus.CANCELLED, createdAt: new Date('2026-01-02') },
+      {
+        id: 'uuid-1',
+        totalValue: 100,
+        status: OrderStatus.COMPLETE,
+        createdAt: new Date('2026-01-01'),
+      },
+      {
+        id: 'uuid-2',
+        totalValue: 200,
+        status: OrderStatus.CANCELLED,
+        createdAt: new Date('2026-01-02'),
+      },
     ];
 
     it('should return paginated orders with default limit and offset', async () => {
@@ -97,10 +110,17 @@ describe('OrdersService', () => {
 
       const result = await service.findAll({});
 
-      expect(mockOrdersRepository.createQueryBuilder).toHaveBeenCalledWith('order');
+      expect(mockOrdersRepository.createQueryBuilder).toHaveBeenCalledWith(
+        'order',
+      );
       expect(mockQueryBuilder.skip).toHaveBeenCalledWith(0);
       expect(mockQueryBuilder.take).toHaveBeenCalledWith(10);
-      expect(result).toEqual({ orders: mockOrders, total: 2, limit: 10, offset: 0 });
+      expect(result).toEqual({
+        orders: mockOrders,
+        total: 2,
+        limit: 10,
+        offset: 0,
+      });
     });
 
     it('should apply custom limit and offset', async () => {
@@ -182,6 +202,50 @@ describe('OrdersService', () => {
       await service.findAll({});
 
       expect(mockQueryBuilder.andWhere).not.toHaveBeenCalled();
+    });
+
+    it('should apply default sort (createdAt DESC) when sort is not provided', async () => {
+      mockQueryBuilder.getManyAndCount.mockResolvedValue([mockOrders, 2]);
+
+      await service.findAll({});
+
+      expect(mockQueryBuilder.orderBy).toHaveBeenCalledWith(
+        'order.createdAt',
+        'DESC',
+      );
+    });
+
+    it('should sort by createdAt ASC', async () => {
+      mockQueryBuilder.getManyAndCount.mockResolvedValue([mockOrders, 2]);
+
+      await service.findAll({ sort: OrderSort.CREATED_AT_ASC });
+
+      expect(mockQueryBuilder.orderBy).toHaveBeenCalledWith(
+        'order.createdAt',
+        'ASC',
+      );
+    });
+
+    it('should sort by totalValue DESC', async () => {
+      mockQueryBuilder.getManyAndCount.mockResolvedValue([mockOrders, 2]);
+
+      await service.findAll({ sort: OrderSort.TOTAL_VALUE_DESC });
+
+      expect(mockQueryBuilder.orderBy).toHaveBeenCalledWith(
+        'order.totalValue',
+        'DESC',
+      );
+    });
+
+    it('should sort by totalValue ASC', async () => {
+      mockQueryBuilder.getManyAndCount.mockResolvedValue([mockOrders, 2]);
+
+      await service.findAll({ sort: OrderSort.TOTAL_VALUE_ASC });
+
+      expect(mockQueryBuilder.orderBy).toHaveBeenCalledWith(
+        'order.totalValue',
+        'ASC',
+      );
     });
   });
 
