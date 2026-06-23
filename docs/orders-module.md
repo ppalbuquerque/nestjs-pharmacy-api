@@ -20,13 +20,19 @@ O módulo `orders` gerencia a criação e cancelamento de pedidos dentro de uma 
 ## Fluxo de Listagem de Pedidos (`findAll`)
 
 ```
-GET /orders?limit=10&offset=0&status=COMPLETE&checkoutId=uuid&createdAtFrom=ISO&createdAtTo=ISO
+GET /orders?limit=10&offset=0&status=COMPLETE&checkoutId=uuid&createdAtFrom=ISO&createdAtTo=ISO&sort=createdAt_desc
   │
   ├─ Aplica filtros opcionais via QueryBuilder
   │     ├─ status          → WHERE order.status = :status
   │     ├─ checkoutId      → WHERE order.checkoutId = :checkoutId
   │     ├─ createdAtFrom   → WHERE order.createdAt >= :createdAtFrom
   │     └─ createdAtTo     → WHERE order.createdAt <= :createdAtTo
+  │
+  ├─ Aplica ordenação: ORDER BY (sempre — padrão createdAt DESC)
+  │     ├─ createdAt_desc  → ORDER BY order.createdAt DESC  (padrão)
+  │     ├─ createdAt_asc   → ORDER BY order.createdAt ASC
+  │     ├─ totalValue_desc → ORDER BY order.totalValue DESC
+  │     └─ totalValue_asc  → ORDER BY order.totalValue ASC
   │
   ├─ Aplica paginação: SKIP offset, TAKE limit
   │
@@ -43,6 +49,7 @@ GET /orders?limit=10&offset=0&status=COMPLETE&checkoutId=uuid&createdAtFrom=ISO&
 | `checkoutId` | UUID | — | Filtro pelo checkout associado |
 | `createdAtFrom` | ISO 8601 | — | Data inicial do range de criação |
 | `createdAtTo` | ISO 8601 | — | Data final do range de criação |
+| `sort` | `createdAt_desc \| createdAt_asc \| totalValue_desc \| totalValue_asc` | `createdAt_desc` | Ordenação dos resultados. Valor inválido → 400 Bad Request |
 
 **Resposta:**
 
@@ -250,6 +257,13 @@ Arquivo: `src/orders/orders.service.spec.ts`
 | `findAll()` → filtra por createdAtTo                      | ✅ |
 | `findAll()` → filtra por range de datas (from + to)       | ✅ |
 | `findAll()` → sem filtros não aplica andWhere             | ✅ |
+| `findAll()` → sort padrão (createdAt DESC) sem param      | ✅ |
+| `findAll()` → ordena por createdAt ASC                    | ✅ |
+| `findAll()` → ordena por totalValue DESC                  | ✅ |
+| `findAll()` → ordena por totalValue ASC                   | ✅ |
+| `ListOrdersDTO` → aceita sort válido                      | ✅ |
+| `ListOrdersDTO` → sort opcional (omitido é válido)        | ✅ |
+| `ListOrdersDTO` → rejeita sort inválido (isEnum)          | ✅ |
 
 **Lacunas identificadas:**
 
