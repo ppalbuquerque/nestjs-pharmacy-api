@@ -7,7 +7,7 @@ import { CheckoutIsClosed } from 'src/checkout/exceptions/CheckoutIsClosed.excep
 
 import { OrderEntity, OrderStatus } from './order.entity';
 import { CreateOrderDTO } from './DTO/create-order.dto';
-import { ListOrdersDTO } from './DTO/list-orders.dto';
+import { ListOrdersDTO, OrderSort } from './DTO/list-orders.dto';
 import { OrderItemEntity } from './order-item.entity';
 import { OrderNotFound } from './exceptions/OrderNotFound.exception';
 
@@ -63,7 +63,15 @@ export class OrdersService {
       checkoutId,
       createdAtFrom,
       createdAtTo,
+      sort = OrderSort.CREATED_AT_DESC,
     } = filters;
+
+    const sortMap: Record<OrderSort, [string, 'ASC' | 'DESC']> = {
+      [OrderSort.CREATED_AT_DESC]: ['order.createdAt', 'DESC'],
+      [OrderSort.CREATED_AT_ASC]: ['order.createdAt', 'ASC'],
+      [OrderSort.TOTAL_VALUE_DESC]: ['order.totalValue', 'DESC'],
+      [OrderSort.TOTAL_VALUE_ASC]: ['order.totalValue', 'ASC'],
+    };
 
     const query = this.ordersRepository
       .createQueryBuilder('order')
@@ -89,6 +97,9 @@ export class OrdersService {
     if (createdAtTo) {
       query.andWhere('order.createdAt <= :createdAtTo', { createdAtTo });
     }
+
+    const [sortColumn, sortDirection] = sortMap[sort];
+    query.orderBy(sortColumn, sortDirection);
 
     query.skip(offset).take(limit);
 

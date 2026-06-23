@@ -78,7 +78,9 @@ describe('CheckoutController', () => {
     it('should propagate CheckoutNotOpen exception from service', async () => {
       mockCheckoutService.resume.mockRejectedValue(new CheckoutNotOpen());
 
-      await expect(controller.getCheckoutResume()).rejects.toThrow(CheckoutNotOpen);
+      await expect(controller.getCheckoutResume()).rejects.toThrow(
+        CheckoutNotOpen,
+      );
     });
   });
 
@@ -100,9 +102,13 @@ describe('CheckoutController', () => {
     });
 
     it('should propagate CheckoutDoesNotExist exception from service', async () => {
-      mockCheckoutService.getStatus.mockRejectedValue(new CheckoutDoesNotExist());
+      mockCheckoutService.getStatus.mockRejectedValue(
+        new CheckoutDoesNotExist(),
+      );
 
-      await expect(controller.getCheckoutStatus()).rejects.toThrow(CheckoutDoesNotExist);
+      await expect(controller.getCheckoutStatus()).rejects.toThrow(
+        CheckoutDoesNotExist,
+      );
     });
   });
 });

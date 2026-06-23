@@ -1,6 +1,26 @@
-import { IsEnum, IsISO8601, IsOptional, IsUUID, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsISO8601,
+  IsNotEmpty,
+  IsOptional,
+  IsUUID,
+  Min,
+  Validate,
+  ValidateIf,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { OrderStatus } from '../order.entity';
+import { IsDateRangeOrderedConstraint } from './validators/is-date-range-ordered.validator';
+
+const dateRangeProvided = (o: ListOrdersDTO) =>
+  o.createdAtFrom !== undefined || o.createdAtTo !== undefined;
+
+export enum OrderSort {
+  CREATED_AT_DESC = 'createdAt_desc',
+  CREATED_AT_ASC = 'createdAt_asc',
+  TOTAL_VALUE_DESC = 'totalValue_desc',
+  TOTAL_VALUE_ASC = 'totalValue_asc',
+}
 
 export class ListOrdersDTO {
   @IsOptional()
@@ -21,11 +41,22 @@ export class ListOrdersDTO {
   @IsUUID()
   checkoutId?: string;
 
-  @IsOptional()
+  @ValidateIf(dateRangeProvided)
+  @IsNotEmpty({
+    message: 'createdAtFrom é obrigatório quando createdAtTo é informado',
+  })
   @IsISO8601()
   createdAtFrom?: string;
 
-  @IsOptional()
+  @ValidateIf(dateRangeProvided)
+  @IsNotEmpty({
+    message: 'createdAtTo é obrigatório quando createdAtFrom é informado',
+  })
   @IsISO8601()
+  @Validate(IsDateRangeOrderedConstraint, ['createdAtFrom'])
   createdAtTo?: string;
+
+  @IsOptional()
+  @IsEnum(OrderSort)
+  sort?: OrderSort = OrderSort.CREATED_AT_DESC;
 }

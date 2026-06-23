@@ -153,6 +153,14 @@ Gerencia pedidos dentro de uma sessão de caixa ativa.
 | `checkoutId` | string (UUID) | — | Filtro por checkout |
 | `createdAtFrom` | string (ISO 8601) | — | Data de criação >= |
 | `createdAtTo` | string (ISO 8601) | — | Data de criação <= |
+| `sort` | `createdAt_desc` \| `createdAt_asc` \| `totalValue_desc` \| `totalValue_asc` | `createdAt_desc` | Ordenação dos resultados. Sempre aplicada. Valor fora da lista → `400 Bad Request` |
+
+> Ordenação padrão: `createdAt_desc` (mais recente → mais antigo). O param `sort` é opcional; um valor não listado retorna `400 Bad Request` (validação `isEnum`).
+
+> **Validação do range de datas** (`400 Bad Request` em caso de violação):
+> - `createdAtFrom` e `createdAtTo` são obrigatórios em conjunto — enviar apenas um retorna erro (`isNotEmpty`).
+> - `createdAtFrom` deve ser **menor ou igual** a `createdAtTo` (`isDateRangeOrdered`); range invertido retorna erro.
+> - Nenhuma das duas datas → válido (filtro de data não aplicado).
 
 **Response `200`**
 ```json
