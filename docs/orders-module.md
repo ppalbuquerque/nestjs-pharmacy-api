@@ -47,9 +47,11 @@ GET /orders?limit=10&offset=0&status=COMPLETE&checkoutId=uuid&createdAtFrom=ISO&
 | `offset` | number | 0 | Deslocamento (mín: 0) |
 | `status` | `COMPLETE \| CANCELLED \| PROCESSING` | — | Filtro por status |
 | `checkoutId` | UUID | — | Filtro pelo checkout associado |
-| `createdAtFrom` | ISO 8601 | — | Data inicial do range de criação |
-| `createdAtTo` | ISO 8601 | — | Data final do range de criação |
+| `createdAtFrom` | ISO 8601 | — | Data inicial do range de criação. Obrigatório se `createdAtTo` for enviado |
+| `createdAtTo` | ISO 8601 | — | Data final do range de criação. Obrigatório se `createdAtFrom` for enviado. Deve ser >= `createdAtFrom` |
 | `sort` | `createdAt_desc \| createdAt_asc \| totalValue_desc \| totalValue_asc` | `createdAt_desc` | Ordenação dos resultados. Valor inválido → 400 Bad Request |
+
+> **Validação do range de datas (no `ListOrdersDTO`):** `createdAtFrom` e `createdAtTo` são obrigatórios em conjunto (enviar só um → 400, `isNotEmpty`) e `createdAtFrom` deve ser menor ou igual a `createdAtTo` (→ 400, `isDateRangeOrdered`). Implementado via `@ValidateIf`/`@IsNotEmpty` + custom constraint `IsDateRangeOrderedConstraint` (`src/orders/DTO/validators/is-date-range-ordered.validator.ts`).
 
 **Resposta:**
 
@@ -217,6 +219,7 @@ PUT /orders/cancel/:id
 4. **Cancelamento por status:** Pedidos já cancelados são tratados como "não encontrados" (`OrderNotFound`), impedindo duplo cancelamento.
 5. **Cascade insert:** Ao salvar um `OrderEntity`, os `OrderItemEntity` são persistidos automaticamente — não há endpoint separado para criar itens.
 6. **medicationId como string no DTO:** O DTO recebe `medicationId` como string e a conversão para inteiro (`parseInt`) ocorre no serviço, não no DTO.
+7. **Range de datas simétrico e ordenado:** Na listagem, `createdAtFrom` e `createdAtTo` só são aceitos juntos; um sem o outro retorna 400. Quando ambos presentes, `createdAtFrom` deve ser menor ou igual a `createdAtTo` (iguais são permitidos). Sem nenhuma das datas, o filtro de data não é aplicado.
 
 ---
 
@@ -264,6 +267,12 @@ Arquivo: `src/orders/orders.service.spec.ts`
 | `ListOrdersDTO` → aceita sort válido                      | ✅ |
 | `ListOrdersDTO` → sort opcional (omitido é válido)        | ✅ |
 | `ListOrdersDTO` → rejeita sort inválido (isEnum)          | ✅ |
+| `ListOrdersDTO` → válido sem nenhuma das datas            | ✅ |
+| `ListOrdersDTO` → exige `createdAtTo` quando só `createdAtFrom` (isNotEmpty) | ✅ |
+| `ListOrdersDTO` → exige `createdAtFrom` quando só `createdAtTo` (isNotEmpty) | ✅ |
+| `ListOrdersDTO` → rejeita range invertido (isDateRangeOrdered) | ✅ |
+| `ListOrdersDTO` → aceita `createdAtFrom` == `createdAtTo` | ✅ |
+| `ListOrdersDTO` → aceita `createdAtFrom` < `createdAtTo`  | ✅ |
 
 **Lacunas identificadas:**
 
