@@ -237,20 +237,23 @@ Exige checkout aberto. `totalValue` de cada item deve ser calculado pelo fronten
 }
 ```
 
-| Campo | Tipo | Obrigatório | Descrição |
+| Campo | Tipo | Obrigatório | Validação |
 |-------|------|-------------|-----------|
-| `paymentValue` | number | Sim | Valor pago pelo cliente |
-| `orderItems` | array | Sim | Mínimo 1 item |
-| `orderItems[].medicationId` | string | Sim | ID do medicamento |
-| `orderItems[].amount` | number (int) | Sim | Quantidade |
-| `orderItems[].totalValue` | number | Sim | Valor total do item |
-| `orderItems[].boxType` | `"box"` \| `"unit"` | Não | Padrão: `"unit"` |
+| `paymentValue` | number | Sim | `>= 0` |
+| `orderItems` | array | Sim | Mínimo 1 item (`ArrayNotEmpty`) |
+| `orderItems[].medicationId` | string | Sim | Não vazio |
+| `orderItems[].amount` | number (int) | Sim | Inteiro `>= 1` |
+| `orderItems[].totalValue` | number | Sim | `>= 0` |
+| `orderItems[].boxType` | `"box"` \| `"unit"` | Sim | Deve ser um valor do enum |
+
+> **Validação:** o corpo é validado pelo `ValidationPipe` global (`whitelist` + `forbidNonWhitelisted`). Campos extras ou que violem as regras acima retornam `400 Bad Request` com mensagens por campo. Itens do array são validados individualmente via `@ValidateNested`.
 
 **Response `201`** — retorna o pedido completo com `orderItems` populados (mesmo schema de `GET /orders/:id`).
 
 **Erros**
 | Status | errorCode | Quando |
 |--------|-----------|--------|
+| 400 | — | Corpo inválido (campo faltando, tipo errado, item inválido, propriedade não permitida) |
 | 403 | `003` | Não há checkout aberto |
 
 ---
