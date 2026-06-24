@@ -192,6 +192,8 @@ POST /orders
 }
 ```
 
+> **Validação do payload (`CreateOrderDTO` / `OrderItemDto`):** o `ValidationPipe` global usa `whitelist` + `forbidNonWhitelisted`, então **todo campo do DTO precisa de decorator `class-validator`** — sem eles a propriedade é tratada como não permitida e a requisição retorna `400 Bad Request` (`property X should not exist`). Regras: `paymentValue` é `number >= 0`; `orderItems` é array não vazio (`@ArrayNotEmpty`) validado item a item (`@ValidateNested` + `@Type`); cada item exige `medicationId` (string não vazia), `amount` (int `>= 1`), `totalValue` (`number >= 0`) e `boxType` (`@IsEnum(BoxType)`).
+
 ---
 
 ## Fluxo de Cancelamento de Pedido (`cancel`)
@@ -273,6 +275,19 @@ Arquivo: `src/orders/orders.service.spec.ts`
 | `ListOrdersDTO` → rejeita range invertido (isDateRangeOrdered) | ✅ |
 | `ListOrdersDTO` → aceita `createdAtFrom` == `createdAtTo` | ✅ |
 | `ListOrdersDTO` → aceita `createdAtFrom` < `createdAtTo`  | ✅ |
+
+Arquivo: `src/orders/DTO/create-order.dto.spec.ts`
+
+| Cenário                                              | Status |
+|------------------------------------------------------|--------|
+| `CreateOrderDTO` → aceita payload válido             | ✅ |
+| `CreateOrderDTO` → rejeita `paymentValue` ausente    | ✅ |
+| `CreateOrderDTO` → rejeita `paymentValue` negativo   | ✅ |
+| `CreateOrderDTO` → rejeita `orderItems` vazio        | ✅ |
+| `CreateOrderDTO` → rejeita `boxType` inválido (aninhado) | ✅ |
+| `CreateOrderDTO` → rejeita `amount` < 1              | ✅ |
+| `CreateOrderDTO` → rejeita `totalValue` negativo     | ✅ |
+| `CreateOrderDTO` → aceita ambos `boxType` válidos    | ✅ |
 
 **Lacunas identificadas:**
 
