@@ -11,8 +11,7 @@ const validPayload = {
   ],
 };
 
-const buildDto = (payload: unknown) =>
-  plainToInstance(CreateOrderDTO, payload);
+const buildDto = (payload: unknown) => plainToInstance(CreateOrderDTO, payload);
 
 describe('CreateOrderDTO', () => {
   it('aceita o payload válido (caso do bug report)', async () => {
@@ -34,7 +33,9 @@ describe('CreateOrderDTO', () => {
   });
 
   it('rejeita orderItems vazio', async () => {
-    const errors = await validate(buildDto({ ...validPayload, orderItems: [] }));
+    const errors = await validate(
+      buildDto({ ...validPayload, orderItems: [] }),
+    );
     expect(errors.some((e) => e.property === 'orderItems')).toBe(true);
   });
 
