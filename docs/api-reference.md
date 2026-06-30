@@ -203,13 +203,18 @@ Gerencia pedidos dentro de uma sessão de caixa ativa.
       "medication": {
         "id": 1,
         "name": "Dipirona 500mg",
+        "chemicalComposition": "Dipirona monoidratada",
+        "boxPrice": 48000,
         "unitPrice": 6000,
-        "boxPrice": 48000
+        "samplePhotoUrl": "https://...",
+        "stockAvailability": 120
       }
     }
   ]
 }
 ```
+
+> **Projeção de medication:** cada `medication` dentro de `orderItems` retorna apenas estes campos: `id`, `name`, `chemicalComposition`, `boxPrice`, `unitPrice`, `samplePhotoUrl`, `stockAvailability`. Demais campos do medicamento não são expostos neste endpoint.
 
 **Erros**
 | Status | errorCode | Quando |

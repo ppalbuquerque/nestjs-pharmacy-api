@@ -12,11 +12,16 @@ import { OrderSort } from './DTO/list-orders.dto';
 
 const mockQueryBuilder = {
   select: jest.fn().mockReturnThis(),
+  addSelect: jest.fn().mockReturnThis(),
+  leftJoin: jest.fn().mockReturnThis(),
+  leftJoinAndSelect: jest.fn().mockReturnThis(),
+  where: jest.fn().mockReturnThis(),
   andWhere: jest.fn().mockReturnThis(),
   orderBy: jest.fn().mockReturnThis(),
   skip: jest.fn().mockReturnThis(),
   take: jest.fn().mockReturnThis(),
   getManyAndCount: jest.fn(),
+  getOne: jest.fn(),
 };
 
 const mockOrdersRepository = {
@@ -43,6 +48,10 @@ describe('OrdersService', () => {
     jest.clearAllMocks();
     mockOrdersRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
     mockQueryBuilder.select.mockReturnThis();
+    mockQueryBuilder.addSelect.mockReturnThis();
+    mockQueryBuilder.leftJoin.mockReturnThis();
+    mockQueryBuilder.leftJoinAndSelect.mockReturnThis();
+    mockQueryBuilder.where.mockReturnThis();
     mockQueryBuilder.andWhere.mockReturnThis();
     mockQueryBuilder.orderBy.mockReturnThis();
     mockQueryBuilder.skip.mockReturnThis();
@@ -251,7 +260,7 @@ describe('OrdersService', () => {
 
   describe('findById()', () => {
     it('should throw OrderNotFound when order does not exist', async () => {
-      mockOrdersRepository.findOne.mockResolvedValue(null);
+      mockQueryBuilder.getOne.mockResolvedValue(null);
 
       await expect(service.findById('non-existent-uuid')).rejects.toThrow(
         OrderNotFound,
@@ -265,15 +274,45 @@ describe('OrdersService', () => {
         status: OrderStatus.COMPLETE,
         orderItems: [],
       };
-      mockOrdersRepository.findOne.mockResolvedValue(mockOrder);
+      mockQueryBuilder.getOne.mockResolvedValue(mockOrder);
 
       const result = await service.findById('uuid-1');
 
-      expect(mockOrdersRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 'uuid-1' },
-        relations: { orderItems: { medication: true } },
-      });
+      expect(mockOrdersRepository.createQueryBuilder).toHaveBeenCalledWith(
+        'order',
+      );
+      expect(mockQueryBuilder.leftJoinAndSelect).toHaveBeenCalledWith(
+        'order.orderItems',
+        'orderItem',
+      );
+      expect(mockQueryBuilder.leftJoin).toHaveBeenCalledWith(
+        'orderItem.medication',
+        'medication',
+      );
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
+        'order.id = :orderId',
+        { orderId: 'uuid-1' },
+      );
       expect(result).toEqual(mockOrder);
+    });
+
+    it('should project only the allowed medication fields', async () => {
+      mockQueryBuilder.getOne.mockResolvedValue({
+        id: 'uuid-1',
+        orderItems: [],
+      });
+
+      await service.findById('uuid-1');
+
+      expect(mockQueryBuilder.addSelect).toHaveBeenCalledWith([
+        'medication.id',
+        'medication.name',
+        'medication.chemicalComposition',
+        'medication.boxPrice',
+        'medication.unitPrice',
+        'medication.samplePhotoUrl',
+        'medication.stockAvailability',
+      ]);
     });
   });
 

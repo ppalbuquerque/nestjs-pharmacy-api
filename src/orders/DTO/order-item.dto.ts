@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsInt, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Min,
+} from 'class-validator';
 
 export enum BoxType {
   BOX = 'box',

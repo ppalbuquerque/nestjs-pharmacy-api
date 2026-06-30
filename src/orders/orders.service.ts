@@ -109,10 +109,21 @@ export class OrdersService {
   }
 
   async findById(orderId: string) {
-    const order = await this.ordersRepository.findOne({
-      where: { id: orderId },
-      relations: { orderItems: { medication: true } },
-    });
+    const order = await this.ordersRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.orderItems', 'orderItem')
+      .leftJoin('orderItem.medication', 'medication')
+      .addSelect([
+        'medication.id',
+        'medication.name',
+        'medication.chemicalComposition',
+        'medication.boxPrice',
+        'medication.unitPrice',
+        'medication.samplePhotoUrl',
+        'medication.stockAvailability',
+      ])
+      .where('order.id = :orderId', { orderId })
+      .getOne();
 
     if (!order) {
       throw new OrderNotFound();

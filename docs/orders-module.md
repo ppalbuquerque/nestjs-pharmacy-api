@@ -76,10 +76,13 @@ GET /orders?limit=10&offset=0&status=COMPLETE&checkoutId=uuid&createdAtFrom=ISO&
 GET /orders/:id
   │
   ├─ Busca order por id com relações: orderItems → medication
+  │     ├─ medication é projetado (select) para apenas 7 campos
   │     └─ Não encontrado → lança OrderNotFound (HTTP 404, code '004')
   │
-  └─ Retorna OrderEntity completo com itens e medicamentos
+  └─ Retorna OrderEntity completo com itens; cada medication traz só os campos projetados
 ```
+
+> **Projeção de medication:** order e orderItems são retornados na íntegra. Para cada `medication` dentro de um item, só são retornados: `id`, `name`, `chemicalComposition`, `boxPrice`, `unitPrice`, `samplePhotoUrl` e `stockAvailability`. Campos internos (`shelfLocation`, `usefulness`, `dosageInstructions`, `fullTextSearch`, `createdAt`, `updatedAt`) são omitidos via `leftJoin` + `addSelect` no QueryBuilder (projeção parcial confiável da relação, evitando o comportamento do `select` aninhado em find options que descarta a relação).
 
 **Resposta:**
 
@@ -97,7 +100,15 @@ GET /orders/:id
       "amount": 2,
       "totalValue": 75.25,
       "boxType": "unit",
-      "medication": { "id": 123, "name": "..." }
+      "medication": {
+        "id": 123,
+        "name": "Dipirona 500mg",
+        "chemicalComposition": "Dipirona monoidratada",
+        "boxPrice": 48000,
+        "unitPrice": 6000,
+        "samplePhotoUrl": "https://...",
+        "stockAvailability": 120
+      }
     }
   ]
 }
@@ -253,6 +264,7 @@ Arquivo: `src/orders/orders.service.spec.ts`
 | `create()` → lança `CheckoutIsClosed` sem checkout aberto | ✅ |
 | `findById()` → lança `OrderNotFound` para id inexistente  | ✅ |
 | `findById()` → retorna order com itens e medication       | ✅ |
+| `findById()` → projeta apenas os 7 campos permitidos de medication | ✅ |
 | `cancel()` → lança `OrderNotFound` para id inexistente    | ✅ |
 | `findAll()` → retorna paginação com limit/offset padrão   | ✅ |
 | `findAll()` → aplica limit e offset customizados          | ✅ |
